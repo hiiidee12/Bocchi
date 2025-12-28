@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>🦖 Dino Runner</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f8f9fa;
+    }
+
+    #game {
+      text-align: center;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game">
+    <h1>🦖 Dino Runner</h1>
+    <p>Mini App Farcaster</p>
+    <button id="start">▶️ Start Game</button>
+  </div>
+
+  <!-- WAJIB: SDK Mini App -->
+  <script type="module">
+    import { sdk } from "https://esm.sh/@farcaster/miniapp-sdk";
+
+    // Beritahu Farcaster bahwa Mini App siap
+    await sdk.actions.ready();
+
+    // Contoh interaksi
+    document.getElementById("start").onclick = () => {
+      alert("Game dimulai! (nanti ganti canvas)");
+    };
+  </script>
+</body>
+</html>
