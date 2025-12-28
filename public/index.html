@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>🦖 Dino Runner</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+    }
+    canvas {
+      background: white;
+      border: 2px solid #ccc;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Canvas versi HP (portrait) -->
+  <canvas id="game" width="360" height="640"></canvas>
+
+  <script type="module">
+    import { sdk } from "https://esm.sh/@farcaster/miniapp-sdk";
+
+    // WAJIB: beri tahu Farcaster Mini App siap
+    await sdk.actions.ready();
+
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    // === GAME CONSTANTS ===
+    const groundY = 520;
+    const dinoX = 60;
+    const dinoWidth = 50;
+    const dinoHeight = 60;
+
+    // === GAME STATE ===
+    let dinoY = groundY - dinoHeight;
+    let velocity = 0;
+    let gravity = 1.3;
+    let jumping = false;
+
+    let cactusX = canvas.width;
+    let score = 0;
+    let gameOver = false;
+
+    // === INPUT ===
+    function jump() {
+      if (!jumping && !gameOver) {
+        velocity = -20;
+        jumping = true;
+      }
+    }
+
+    window.addEventListener("pointerdown", jump);
+    window.addEventListener("keydown", e => {
+      if (e.code === "Space") jump();
+    });
+
+    function reset() {
+      score = 0;
+      cactusX = canvas.width;
+      gameOver = false;
+      jumping = false;
+      velocity = 0;
+      dinoY = groundY - dinoHeight;
+    }
+
+    // === UPDATE ===
+    function update() {
+      if (gameOver) return;
+
+      // Dino physics
+      velocity += gravity;
+      dinoY += velocity;
+
+      if (dinoY >= groundY - dinoHeight) {
+        dinoY = groundY - dinoHeight;
+        velocity = 0;
+        jumping = false;
+      }
+
+      // Cactus movement
+      cactusX -= 6;
+      if (cactusX < -30) {
+        cactusX = canvas.width;
+        score++;
+      }
+
+      // Collision
+      if (
+        cactusX < dinoX + dinoWidth &&
+        cactusX + 30 > dinoX &&
+        dinoY + dinoHeight > groundY - 10
+      ) {
+        gameOver = true;
+        setTimeout(reset, 1500);
+      }
+    }
+
+    // === DRAW ===
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Score (PASTI KELIHATAN)
+      ctx.fillStyle = "#000";
+      ctx.font = "22px sans-serif";
+      ctx.fillText("Score: " + score, 20, 40);
+
+      // Ground
+      ctx.fillStyle = "#8b4513";
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+      // Dino
+      ctx.fillStyle = "#563d2d";
+      ctx.fillRect(dinoX, dinoY, dinoWidth, dinoHeight);
+
+      // Cactus
+      ctx.fillStyle = "#228b22";
+      ctx.fillRect(cactusX, groundY - 40, 30, 40);
+
+      // Game Over text
+      if (gameOver) {
+        ctx.fillStyle = "#f44336";
+        ctx.font = "36px sans-serif";
+        ctx.fillText("GAME OVER", 70, canvas.height / 2);
+      }
+    }
+
+    // === GAME LOOP ===
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script>
+</body>
+</html>
