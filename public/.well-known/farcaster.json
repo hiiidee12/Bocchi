@@ -3,9 +3,7 @@
   "name": "Dino Runner",
   "icon": "https://bocchi-mu.vercel.app/icon.png",
   "home_url": "https://bocchi-mu.vercel.app/"
-}
-{
-  "accountAssociation": {
+ "accountAssociation": {
     "header": "eyJmaWQiOjI2NjQ5OCwidHlwZSI6ImF1dGgiLCJrZXkiOiIweDIxNDhBYjVGZTFCNzY3MjM4YTdhOUNBNjg3YkE1QWExNGFkN0VBMDMifQ",
     "payload": "eyJkb21haW4iOiJib2NjaGktbXUudmVyY2VsLmFwcCJ9",
     "signature": "jsRn90KPkn+P9denQ4ZeaqGkbPFQjcLJ+WqKJReycfMmgHiP913YOwX+Hqreio9H1wqY+2ovDjxhNNpyJQ7mthw="
