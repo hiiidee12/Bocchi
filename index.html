@@ -15,38 +15,49 @@
       align-items: center;
       height: 100vh;
       font-family: system-ui, sans-serif;
+      overflow: hidden;
     }
     canvas {
       background: white;
       border: 2px solid #ccc;
+      touch-action: manipulation;
     }
   </style>
 </head>
 
 <body>
-  <canvas id="game" width="800" height="400"></canvas>
+  <!-- Canvas versi HP (portrait) -->
+  <canvas id="game" width="360" height="640"></canvas>
 
   <script type="module">
     import { sdk } from "https://esm.sh/@farcaster/miniapp-sdk";
 
-    // WAJIB: Mini App siap
+    // WAJIB: beri tahu Farcaster Mini App siap
     await sdk.actions.ready();
 
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
 
-    let dinoY = 300;
+    // === GAME CONSTANTS ===
+    const groundY = 520;
+    const dinoX = 60;
+    const dinoWidth = 50;
+    const dinoHeight = 60;
+
+    // === GAME STATE ===
+    let dinoY = groundY - dinoHeight;
     let velocity = 0;
-    let gravity = 1.2;
+    let gravity = 1.3;
     let jumping = false;
 
-    let cactusX = 800;
+    let cactusX = canvas.width;
     let score = 0;
     let gameOver = false;
 
+    // === INPUT ===
     function jump() {
       if (!jumping && !gameOver) {
-        velocity = -18;
+        velocity = -20;
         jumping = true;
       }
     }
@@ -58,64 +69,75 @@
 
     function reset() {
       score = 0;
-      cactusX = 800;
+      cactusX = canvas.width;
       gameOver = false;
       jumping = false;
-      dinoY = 300;
+      velocity = 0;
+      dinoY = groundY - dinoHeight;
     }
 
+    // === UPDATE ===
     function update() {
       if (gameOver) return;
 
       // Dino physics
       velocity += gravity;
       dinoY += velocity;
-      if (dinoY >= 300) {
-        dinoY = 300;
+
+      if (dinoY >= groundY - dinoHeight) {
+        dinoY = groundY - dinoHeight;
         velocity = 0;
         jumping = false;
       }
 
-      // Cactus
+      // Cactus movement
       cactusX -= 6;
-      if (cactusX < -40) {
-        cactusX = 800;
+      if (cactusX < -30) {
+        cactusX = canvas.width;
         score++;
       }
 
       // Collision
-      if (cactusX < 160 && cactusX > 100 && dinoY > 260) {
+      if (
+        cactusX < dinoX + dinoWidth &&
+        cactusX + 30 > dinoX &&
+        dinoY + dinoHeight > groundY - 10
+      ) {
         gameOver = true;
         setTimeout(reset, 1500);
       }
     }
 
+    // === DRAW ===
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Score (PASTI KELIHATAN)
+      ctx.fillStyle = "#000";
+      ctx.font = "22px sans-serif";
+      ctx.fillText("Score: " + score, 20, 40);
+
       // Ground
       ctx.fillStyle = "#8b4513";
-      ctx.fillRect(0, 340, 800, 60);
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
 
       // Dino
       ctx.fillStyle = "#563d2d";
-      ctx.fillRect(100, dinoY, 60, 60);
+      ctx.fillRect(dinoX, dinoY, dinoWidth, dinoHeight);
 
       // Cactus
       ctx.fillStyle = "#228b22";
-      ctx.fillRect(cactusX, 300, 30, 40);
+      ctx.fillRect(cactusX, groundY - 40, 30, 40);
 
-      // Score
-      ctx.fillStyle = "#000";
-      ctx.font = "20px sans-serif";
-      ctx.fillText("Score: " + score, 20, 30);
-
+      // Game Over text
       if (gameOver) {
-        ctx.font = "40px sans-serif";
-        ctx.fillText("GAME OVER", 280, 200);
+        ctx.fillStyle = "#f44336";
+        ctx.font = "36px sans-serif";
+        ctx.fillText("GAME OVER", 70, canvas.height / 2);
       }
     }
 
+    // === GAME LOOP ===
     function loop() {
       update();
       draw();
